@@ -1,0 +1,12 @@
+[package]
+name = "polydoc_js"
+version = "0.1.0"
+authors = ["Pirh"]
+
+[dependencies]
+easter = "0.0.5"
+esprit = "0.0.5"
+joker = "0.0.5"
+
+[dependencies.polydoc_core]
+path = "../polydoc_core"

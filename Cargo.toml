@@ -1,0 +1,10 @@
+[package]
+name = "polydoc"
+version = "0.1.0"
+authors = ["Pirh"]
+
+[dependencies]
+clap = "2.24.2"
+
+[dependencies.polydoc_js]
+path = "src/polydoc_js"
