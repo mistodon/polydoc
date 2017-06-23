@@ -1,4 +1,41 @@
+use regex::Match;
 use DocItem;
+
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+struct Token
+{
+    token_type: TokenType,
+    start: usize,
+    end: usize
+}
+
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+enum TokenType
+{
+    Single,
+    MultiOpen,
+    MultiClose,
+    Newline
+}
+
+
+fn parse_token(delim: Option<&Match>) -> Option<Token>
+{
+    match delim
+    {
+        None => None,
+        Some(delim) => match delim.as_str()
+        {
+            "///" => Some(Token { token_type: TokenType::Single, start: delim.start(), end: delim.end() }),
+            "/**" => Some(Token { token_type: TokenType::MultiOpen, start: delim.start(), end: delim.end() }),
+            "*/" => Some(Token { token_type: TokenType::MultiClose, start: delim.start(), end: delim.end() }),
+            "\n" => Some(Token { token_type: TokenType::Newline, start: delim.start(), end: delim.end() }),
+            _ => unreachable!()
+        }
+    }
+}
 
 
 pub fn extract_docs<S>(source: S) -> Vec<DocItem>
@@ -16,36 +53,12 @@ where
 
     let mut delims = delim_regex.find_iter(source_str).peekable();
 
-    #[derive(Debug)]
-    enum Token
+    while let Some(token) = parse_token(delims.peek())
     {
-        None,
-        Single,
-        MultiOpen,
-        MultiClose,
-        Newline
-    }
-
-    // Top-level parsing
-    loop
-    {
-        let token = match delims.peek()
+        match token.token_type
         {
-            None => Token::None,
-            Some(delim) => match delim.as_str()
-            {
-                "///" => Token::Single,
-                "/**" => Token::MultiOpen,
-                "*/" => Token::MultiClose,
-                "\n" => Token::Newline,
-                _ => unreachable!()
-            }
-        };
-
-        match token
-        {
-            Token::Newline => line += 1,
-            Token::Single =>
+            TokenType::Newline => line += 1,
+            TokenType::Single =>
             {
                 // Parsing single-line comments
 
@@ -54,46 +67,30 @@ where
                 let mut end_line = start_line;
                 let mut comment_start = None;
 
-                loop
+                while let Some(token) = parse_token(delims.peek())
                 {
-                    let (token, _start, end) = match delims.peek()
-                    {
-                        None => (Token::None, 0, 0),
-                        Some(delim) => match delim.as_str()
-                        {
-                            "///" => (Token::Single, delim.start(), delim.end()),
-                            "/**" => (Token::MultiOpen, delim.start(), delim.end()),
-                            "*/" => (Token::MultiClose, delim.start(), delim.end()),
-                            "\n" => (Token::Newline, delim.start(), delim.end()),
-                            _ => unreachable!()
-                        }
-                    };
+                    if token.token_type == TokenType::Newline
+                        { line += 1; }
 
-                    if let Token::Newline = token
+                    match (comment_start, token.token_type)
                     {
-                        line += 1;
-                    }
-
-                    match (comment_start, token)
-                    {
-                        (Some(start_pos), Token::Newline) =>
+                        (Some(start_pos), TokenType::Newline) =>
                         {
-                            buffer.push_str(&source_str[start_pos..end]);
+                            buffer.push_str(&source_str[start_pos..token.end]);
                             comment_start = None;
                         }
-                        (None, Token::Single) =>
+                        (None, TokenType::Single) =>
                         {
-                            comment_start = Some(end);
+                            comment_start = Some(token.end);
                             end_line = line;
                         }
-                        (None, _) | (_, Token::None) => break,
+                        (None, _) => break,
                         _ => ()
                     }
 
                     delims.next();
                 }
 
-                // ^ Case (Some(start_pos), Token::None)
                 if let Some(start_pos) = comment_start
                 {
                     buffer.push_str(&source_str[start_pos..]);
@@ -101,12 +98,11 @@ where
 
                 docs.push(DocItem { start_line, end_line, text: buffer });
             }
-            Token::MultiOpen =>
+            TokenType::MultiOpen =>
             {
                 // Parsing multi-line comments
             }
-            Token::MultiClose => (),
-            Token::None => break
+            TokenType::MultiClose => ()
         }
 
         delims.next();
