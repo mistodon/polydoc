@@ -100,7 +100,31 @@ where
             }
             TokenType::MultiOpen =>
             {
-                // Parsing multi-line comments
+                let start_line = line;
+                let start_pos = token.end;
+                let mut end_line = None;
+                let mut end_pos = None;
+
+                while let Some(token) = parse_token(delims.peek())
+                {
+                    match token.token_type
+                    {
+                        TokenType::Newline => line += 1,
+                        TokenType::MultiClose =>
+                        {
+                            end_line = Some(line);
+                            end_pos = Some(token.start);
+                            break;
+                        }
+                        _ => ()
+                    }
+
+                    delims.next();
+                }
+
+                let text = source_str[start_pos..end_pos.unwrap()].to_owned();
+                let end_line = end_line.unwrap();
+                docs.push(DocItem { start_line, end_line, text })
             }
             TokenType::MultiClose => ()
         }
@@ -173,5 +197,55 @@ mod tests
             /// First line
         /// Second line
         "#, &vec![docitem(1, 2, " First line\n Second line\n")]);
+    }
+
+    #[test]
+    fn single_line_multiline_comment()
+    {
+        test_extraction("/** Comment */", &vec![docitem(0, 0, " Comment ")]);
+    }
+
+    #[test]
+    fn two_line_multiline_comment()
+    {
+        test_extraction("/** First line\n Second line */", &vec![docitem(0, 1, " First line\n Second line ")]);
+    }
+
+    #[test]
+    fn two_line_multiline_comment_trailing_newline()
+    {
+        test_extraction("/** First line\n Second line\n */", &vec![docitem(0, 2, " First line\n Second line\n ")]);
+    }
+
+    #[test]
+    fn two_multiline_comments()
+    {
+        test_extraction("/** First comment */\n/** Second comment */",
+            &vec![
+                docitem(0, 0, " First comment "),
+                docitem(1, 1, " Second comment ")]);
+    }
+
+    #[test]
+    #[ignore]
+    fn indented_multiline_comment()
+    {
+        test_extraction(r#"
+        /**
+            First line
+            Second line
+        */"#, &vec![docitem(1, 4, "First line\nSecond line\ns")]);
+    }
+
+    #[test]
+    fn single_then_multi_comment()
+    {
+        assert!(false);
+    }
+
+    #[test]
+    fn multi_then_single_comment()
+    {
+        assert!(false);
     }
 }
