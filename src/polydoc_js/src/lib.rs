@@ -4,10 +4,10 @@ extern crate joker;
 extern crate polydoc_core;
 
 
-use polydoc_core::{SourceItem, ItemType};
+use polydoc_core::{DeclItem, DeclType};
 
 
-pub fn generate<S>(source: S) -> Vec<SourceItem>
+pub fn generate<S>(source: S) -> Vec<DeclItem>
 where
     S: AsRef<str>
 {
@@ -16,7 +16,7 @@ where
 }
 
 
-fn extract_declarations<S>(source: S) -> Vec<SourceItem>
+fn extract_declarations<S>(source: S) -> Vec<DeclItem>
 where
     S: AsRef<str>
 {
@@ -38,11 +38,11 @@ where
                 let ref name = f.id.as_ref().expect("Expected function name.").name;
                 if let &Name::String(ref s) = name
                 {
-                    let doc = SourceItem
+                    let doc = DeclItem
                     {
                         line,
                         name: s.clone(),
-                        data: ItemType::Function
+                        data: DeclType::Function
                     };
                     items.push(doc);
                 }

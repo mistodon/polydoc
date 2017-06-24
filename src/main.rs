@@ -37,6 +37,8 @@ If no source files are provided, source code is read from standard input."#)
                 let mut filestring = String::new();
                 let mut file = File::open(input).expect("open");
                 file.read_to_string(&mut filestring).expect("read");
+
+                // TODO: Allow any combination of language parsing functions, doc parsing function, and merging functions
                 let mut filedocs = polydoc_js::generate(&filestring);
                 docs.append(&mut filedocs);
             }
@@ -46,6 +48,8 @@ If no source files are provided, source code is read from standard input."#)
         {
             let mut stdin = String::new();
             std::io::stdin().read_to_string(&mut stdin).expect("polydoc: Failed to read from stdin.");
+
+            // TODO: Allow any combination of language parsing functions, doc parsing function, and merging functions
             let docs = polydoc_js::generate(&stdin);
             docs
         }
