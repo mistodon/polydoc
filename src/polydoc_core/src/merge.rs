@@ -9,7 +9,7 @@ pub fn merge_docs_with_decls(docs: &Vec<DocItem>, decls: &Vec<DeclItem>) -> Vec<
     {
         for doc in docs
         {
-            if doc.start_line == decl.line - 1
+            if doc.end_line == decl.line - 1
             {
                 let documented = match decl.data
                 {
@@ -81,6 +81,13 @@ mod tests
     fn merge_1_doc_1_decl()
     {
         test_merge(vec![docitem(0, 0, "Doc")], vec![funcdecl(1, "Func")],
+            vec![docfunc("Func", "Doc")]);
+    }
+
+    #[test]
+    fn merge_1_multiline_doc_1_decl()
+    {
+        test_merge(vec![docitem(0, 2, "Doc")], vec![funcdecl(3, "Func")],
             vec![docfunc("Func", "Doc")]);
     }
 

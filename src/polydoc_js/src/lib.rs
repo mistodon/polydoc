@@ -4,15 +4,18 @@ extern crate joker;
 extern crate polydoc_core;
 
 
-use polydoc_core::{DeclItem, DeclType};
+use polydoc_core::{DeclItem, DeclType, DocumentedItem};
 
 
-pub fn generate<S>(source: S) -> Vec<DeclItem>
+pub fn generate<S>(source: S) -> Vec<DocumentedItem>
 where
     S: AsRef<str>
 {
-    // This should parse docs and tie results together
-    extract_declarations(source)
+    use polydoc_core::{docparsing, merge};
+
+    let docs = docparsing::extract_docs(&source);
+    let decls = extract_declarations(&source);
+    merge::merge_docs_with_decls(&docs, &decls)
 }
 
 
