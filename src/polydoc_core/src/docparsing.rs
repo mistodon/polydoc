@@ -38,9 +38,7 @@ fn parse_token(delim: Option<&Match>) -> Option<Token>
 }
 
 
-pub fn extract_docs<S>(source: S) -> Vec<DocItem>
-where
-    S: AsRef<str>
+pub fn extract_docs(source: &str) -> Vec<DocItem>
 {
     use regex::Regex;
 

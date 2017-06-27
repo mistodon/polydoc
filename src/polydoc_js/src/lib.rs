@@ -4,24 +4,10 @@ extern crate joker;
 extern crate polydoc_core;
 
 
-use polydoc_core::{DeclItem, DeclType, DocumentedItem};
+use polydoc_core::{DeclItem, DeclType};
 
 
-pub fn generate<S>(source: S) -> Vec<DocumentedItem>
-where
-    S: AsRef<str>
-{
-    use polydoc_core::{docparsing, merge};
-
-    let docs = docparsing::extract_docs(&source);
-    let decls = extract_declarations(&source);
-    merge::merge_docs_with_decls(&docs, &decls)
-}
-
-
-fn extract_declarations<S>(source: S) -> Vec<DeclItem>
-where
-    S: AsRef<str>
+pub fn extract_declarations(source: &str) -> Vec<DeclItem>
 {
     use esprit;
     use easter::stmt::StmtListItem;
@@ -29,7 +15,7 @@ where
     use joker::word::Name;
 
     let mut items = Vec::new();
-    let script = esprit::script(source.as_ref()).expect("Failed to parse javascript.");
+    let script = esprit::script(source).expect("Failed to parse javascript.");
 
     for item in &script.body
     {
@@ -63,25 +49,4 @@ mod tests
 {
     use super::*;
 
-    #[test]
-    fn print_and_fail()
-    {
-        let docs = extract_declarations(r#"
-            // This is a function which returns the number 2.
-            // Use it wisely.
-            function two() {
-                return 2;
-            }
-
-            /**
-              This is a function which returns the number 3.
-              Use it any way you want I guess.
-            */
-            function three() {
-                return 3;
-            }
-        "#);
-        println!("{:?}", docs);
-        assert!(false);
-    }
 }

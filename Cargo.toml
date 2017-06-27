@@ -4,7 +4,13 @@ version = "0.1.0"
 authors = ["Pirh"]
 
 [dependencies]
-clap = "2.24.2"
+clap = "2.25"
+serde = "1.0"
+serde_json = "1.0"
+serde_yaml = "0.7"
+
+[dependencies.polydoc_core]
+path = "src/polydoc_core"
 
 [dependencies.polydoc_js]
 path = "src/polydoc_js"

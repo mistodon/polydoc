@@ -1,7 +1,7 @@
 use {DocItem, DeclItem, DocumentedItem, DeclType};
 
 
-pub fn merge_docs_with_decls(docs: &Vec<DocItem>, decls: &Vec<DeclItem>) -> Vec<DocumentedItem>
+pub fn merge_docs_with_decls(docs: &[DocItem], decls: &[DeclItem]) -> Vec<DocumentedItem>
 {
     let mut documented_items = Vec::new();
 
