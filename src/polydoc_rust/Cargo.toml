@@ -4,7 +4,9 @@ version = "0.1.0"
 authors = ["Pirh"]
 
 [dependencies]
-
+syntex_syntax = "0.59.1"
+syntex_errors = "0.59.1"
+syntex_pos = "0.59.1"
 
 [dependencies.polydoc_core]
 path = "../polydoc_core"
