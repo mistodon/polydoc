@@ -40,10 +40,6 @@ pub struct DocComment
 }
 
 
-/// TODO:
-///     - Make this a struct rather than an enum.
-///     - Make all fields Options.
-///     - Make an ItemType enum to be the type field.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum Doc
