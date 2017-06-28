@@ -1,5 +1,5 @@
 use regex::Match;
-use DocItem;
+use DocComment;
 
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -38,7 +38,7 @@ fn parse_token(delim: Option<&Match>) -> Option<Token>
 }
 
 
-pub fn extract_docs(source: &str) -> Vec<DocItem>
+pub fn extract_docs(source: &str) -> Vec<DocComment>
 {
     use regex::Regex;
 
@@ -106,7 +106,7 @@ pub fn extract_docs(source: &str) -> Vec<DocItem>
                         buffer.push_str(line_str.trim());
                     }
 
-                    docs.push(DocItem { start_line, end_line, text: buffer.trim().to_owned() });
+                    docs.push(DocComment { start_line, end_line, text: buffer.trim().to_owned() });
                 }
 
                 continue;
@@ -164,7 +164,7 @@ pub fn extract_docs(source: &str) -> Vec<DocItem>
                                     TokenType::MultiClose =>
                                     {
                                         let end_line = line;
-                                        docs.push(DocItem { start_line, end_line, text: buffer.trim().to_owned() });
+                                        docs.push(DocComment { start_line, end_line, text: buffer.trim().to_owned() });
                                         break;
                                     }
                                     _ => unreachable!()
@@ -194,15 +194,15 @@ mod tests
 {
     use super::*;
 
-    fn test_extraction(source: &str, expected: &Vec<DocItem>)
+    fn test_extraction(source: &str, expected: &Vec<DocComment>)
     {
         let docs = extract_docs(source);
         assert_eq!(&docs, expected);
     }
 
-    fn docitem(start_line: u64, end_line: u64, text: &str) -> DocItem
+    fn docitem(start_line: u64, end_line: u64, text: &str) -> DocComment
     {
-        DocItem
+        DocComment
         {
             start_line,
             end_line,

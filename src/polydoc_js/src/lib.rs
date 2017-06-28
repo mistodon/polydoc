@@ -4,10 +4,10 @@ extern crate joker;
 extern crate polydoc_core;
 
 
-use polydoc_core::{DeclItem, DeclType};
+use polydoc_core::{Declaration, DeclType};
 
 
-pub fn extract_declarations(source: &str) -> Vec<DeclItem>
+pub fn extract_declarations(source: &str) -> Vec<Declaration>
 {
     use esprit;
     use easter::stmt::StmtListItem;
@@ -27,7 +27,7 @@ pub fn extract_declarations(source: &str) -> Vec<DeclItem>
                 let ref name = f.id.as_ref().expect("Expected function name.").name;
                 if let &Name::String(ref s) = name
                 {
-                    let doc = DeclItem
+                    let doc = Declaration
                     {
                         line,
                         name: s.clone(),

@@ -1,12 +1,11 @@
 extern crate clap;
 extern crate polydoc;
-extern crate polydoc_core;
-extern crate polydoc_js;
+extern crate serde;
 extern crate serde_json;
 extern crate serde_yaml;
 
 
-use polydoc_core::DocumentedItem;
+use serde::Serialize;
 
 
 fn main()
@@ -43,49 +42,50 @@ If no source files are provided, source code is read from standard input."#)
     let args = cli.get_matches();
     let inputs = args.values_of("inputs");
 
-    let doc_parse_func = polydoc_core::docparsing::extract_docs;
-    let source_parse_func = polydoc_js::extract_declarations;
-    let merge_func = polydoc_core::merge::merge_docs_with_decls;
-    let serialize_func = match args.value_of("format").unwrap()
-    {
-        "json" => serialize_to_json,
-        "yaml" => serialize_to_yaml,
-        _ => unreachable!()
-    };
+    let format = args.value_of("format").unwrap();
 
     match inputs
     {
         Some(inputs) =>
         {
-            for input in inputs
+            use std::collections::HashMap;
+
+            let mut file_docs = HashMap::new();
+
+            for filename in inputs
             {
                 let mut filestring = String::new();
-                let mut file = File::open(input).expect("Open failed");
+                let mut file = File::open(filename).expect("Open failed");
                 file.read_to_string(&mut filestring).expect("Read failed");
 
-                let serialized = polydoc::polydoc(&filestring, &doc_parse_func, &source_parse_func, &merge_func, &serialize_func).expect("polydoc: error in inputs");
-                println!("{}", serialized);
+                let docs = polydoc::parse_from_source(&filestring);
+                file_docs.insert(filename, docs);
             }
+
+            let serialized = serialize(&file_docs, format).expect("Failed to serialize");
+            println!("{}", serialized);
         },
         None =>
         {
             let mut stdin = String::new();
             std::io::stdin().read_to_string(&mut stdin).expect("polydoc: Failed to read from stdin.");
 
-            let serialized = polydoc::polydoc(&stdin, &doc_parse_func, &source_parse_func, &merge_func, &serialize_func).expect("polydoc: error in inputs");
+            let docs = polydoc::parse_from_source(&stdin);
+            let serialized = serialize(&docs, format).expect("Failed to serialize");
             println!("{}", serialized);
         }
     };
 }
 
 
-fn serialize_to_json(items: &[DocumentedItem]) -> Option<String>
+fn serialize<T>(items: &T, format: &str) -> Option<String>
+where
+    T: Serialize
 {
-    serde_json::to_string(items).ok()
-}
-
-
-fn serialize_to_yaml(items: &[DocumentedItem]) -> Option<String>
-{
-    serde_yaml::to_string(items).ok()
+    match format
+    {
+        "json" => serde_json::to_string(items).ok(),
+        "yaml" => serde_yaml::to_string(items).ok(),
+        _ => unreachable!()
+    }
 }

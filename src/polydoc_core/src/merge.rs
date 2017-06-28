@@ -1,7 +1,7 @@
-use {DocItem, DeclItem, DocumentedItem, DeclType};
+use {DocComment, Declaration, Doc, DeclType};
 
 
-pub fn merge_docs_with_decls(docs: &[DocItem], decls: &[DeclItem]) -> Vec<DocumentedItem>
+pub fn merge_docs_with_decls(docs: &[DocComment], decls: &[Declaration]) -> Vec<Doc>
 {
     let mut documented_items = Vec::new();
 
@@ -13,7 +13,7 @@ pub fn merge_docs_with_decls(docs: &[DocItem], decls: &[DeclItem]) -> Vec<Docume
             {
                 let documented = match decl.data
                 {
-                    DeclType::Function => DocumentedItem::Function
+                    DeclType::Function => Doc::Function
                     {
                         name: decl.name.clone(),
                         description: doc.text.clone()
@@ -35,9 +35,9 @@ mod tests
     use super::*;
 
 
-    fn docitem(start_line: u64, end_line: u64, text: &str) -> DocItem
+    fn docitem(start_line: u64, end_line: u64, text: &str) -> DocComment
     {
-        DocItem
+        DocComment
         {
             start_line,
             end_line,
@@ -45,9 +45,9 @@ mod tests
         }
     }
 
-    fn funcdecl(start_line: u64, name: &str) -> DeclItem
+    fn funcdecl(start_line: u64, name: &str) -> Declaration
     {
-        DeclItem
+        Declaration
         {
             line: start_line,
             name: name.to_owned(),
@@ -55,9 +55,9 @@ mod tests
         }
     }
 
-    fn docfunc(name: &str, description: &str) -> DocumentedItem
+    fn docfunc(name: &str, description: &str) -> Doc
     {
-        DocumentedItem::Function
+        Doc::Function
         {
             name: name.to_owned(),
             description: description.to_owned()
@@ -65,7 +65,7 @@ mod tests
     }
 
 
-    fn test_merge(docs: Vec<DocItem>, decls: Vec<DeclItem>, expected: Vec<DocumentedItem>)
+    fn test_merge(docs: Vec<DocComment>, decls: Vec<Declaration>, expected: Vec<Doc>)
     {
         let result = merge_docs_with_decls(&docs, &decls);
         assert_eq!(result, expected);

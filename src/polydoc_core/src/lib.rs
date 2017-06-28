@@ -8,13 +8,13 @@ pub mod docparsing;
 pub mod merge;
 
 
-pub type DocParseFn<'a> = &'a Fn(&str) -> Vec<DocItem>;
-pub type SourceParseFn<'a> = &'a Fn(&str) -> Vec<DeclItem>;
-pub type MergeFn<'a> = &'a Fn(&[DocItem], &[DeclItem]) -> Vec<DocumentedItem>;
+pub type DocParseFn<'a> = &'a Fn(&str) -> Vec<DocComment>;
+pub type SourceParseFn<'a> = &'a Fn(&str) -> Vec<Declaration>;
+pub type MergeFn<'a> = &'a Fn(&[DocComment], &[Declaration]) -> Vec<Doc>;
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct DeclItem
+pub struct Declaration
 {
     pub line: u64,
     pub name: String,
@@ -30,7 +30,7 @@ pub enum DeclType
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct DocItem
+pub struct DocComment
 {
     pub start_line: u64,
     pub end_line: u64,
@@ -40,7 +40,7 @@ pub struct DocItem
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type")]
-pub enum DocumentedItem
+pub enum Doc
 {
     Function
     {
