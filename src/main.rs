@@ -1,5 +1,9 @@
 extern crate clap;
+
 extern crate polydoc;
+extern crate polydoc_js;
+extern crate polydoc_rust;
+
 extern crate serde;
 extern crate serde_json;
 extern crate serde_yaml;
@@ -26,6 +30,14 @@ fn main()
                     .multiple(true)
             )
             .arg(
+                Arg::with_name("language")
+                    .short("-l")
+                    .long("--lang")
+                    .help("The programming language of the source files.")
+                    .possible_values(&["js", "rust"])
+                    .takes_value(true)
+            )
+            .arg(
                 Arg::with_name("format")
                     .short("-f")
                     .long("--format")
@@ -41,6 +53,13 @@ If no source files are provided, source code is read from standard input."#)
 
     let args = cli.get_matches();
     let inputs = args.values_of("inputs");
+
+    let source_parse_fn = match args.value_of("language")
+    {
+        Some("js") => polydoc_js::extract_declarations,
+        Some("rust") => polydoc_rust::extract_declarations,
+        _ => polydoc_js::extract_declarations
+    };
 
     let format = args.value_of("format").unwrap();
 
@@ -58,7 +77,7 @@ If no source files are provided, source code is read from standard input."#)
                 let mut file = File::open(filename).expect("Open failed");
                 file.read_to_string(&mut filestring).expect("Read failed");
 
-                let docs = polydoc::parse_from_source(&filestring);
+                let docs = polydoc::parse_from_source(&filestring, &source_parse_fn);
                 file_docs.insert(filename, docs);
             }
 
@@ -70,7 +89,7 @@ If no source files are provided, source code is read from standard input."#)
             let mut stdin = String::new();
             std::io::stdin().read_to_string(&mut stdin).expect("polydoc: Failed to read from stdin.");
 
-            let docs = polydoc::parse_from_source(&stdin);
+            let docs = polydoc::parse_from_source(&stdin, &source_parse_fn);
             let serialized = serialize(&docs, format).expect("Failed to serialize");
             println!("{}", serialized);
         }

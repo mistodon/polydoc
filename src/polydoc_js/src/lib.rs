@@ -29,9 +29,11 @@ pub fn extract_declarations(source: &str) -> Vec<Declaration>
                 {
                     let doc = Declaration
                     {
-                        line,
-                        name: s.clone(),
-                        data: DeclType::Function
+                        start_line: line,
+                        decl: DeclType::Function
+                        {
+                            name: s.clone()
+                        }
                     };
                     items.push(doc);
                 }

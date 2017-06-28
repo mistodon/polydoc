@@ -14,3 +14,6 @@ path = "src/polydoc_core"
 
 [dependencies.polydoc_js]
 path = "src/polydoc_js"
+
+[dependencies.polydoc_rust]
+path = "src/polydoc_rust"

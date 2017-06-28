@@ -9,13 +9,13 @@ pub fn merge_docs_with_decls(docs: &[DocComment], decls: &[Declaration]) -> Vec<
     {
         for doc in docs
         {
-            if doc.end_line == decl.line - 1
+            if doc.end_line == decl.start_line - 1
             {
-                let documented = match decl.data
+                let documented = match decl.decl
                 {
-                    DeclType::Function => Doc::Function
+                    DeclType::Function { ref name } => Doc::Function
                     {
-                        name: decl.name.clone(),
+                        name: name.clone(),
                         description: doc.text.clone()
                     }
                 };

@@ -16,9 +16,8 @@ pub type MergeFn<'a> = &'a Fn(&[DocComment], &[Declaration]) -> Vec<Doc>;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Declaration
 {
-    pub line: u64,
-    pub name: String,
-    pub data: DeclType
+    pub start_line: u64,
+    pub decl: DeclType
 }
 
 
@@ -26,6 +25,9 @@ pub struct Declaration
 pub enum DeclType
 {
     Function
+    {
+        name: String
+    }
 }
 
 
@@ -38,6 +40,10 @@ pub struct DocComment
 }
 
 
+/// TODO:
+///     - Make this a struct rather than an enum.
+///     - Make all fields Options.
+///     - Make an ItemType enum to be the type field.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum Doc
