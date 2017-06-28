@@ -20,7 +20,7 @@ fn main()
 
     let cli = {
         App::new("polydoc")
-            .author("Pirh, <***redacted.email@redacted.nope***>")
+            .author("Pirh, <pirh.badger@gmail.com>")
             .version("0.1.0")
             .about("Parse code and comments and generate JSON-formatted documentation.")
             .arg(
