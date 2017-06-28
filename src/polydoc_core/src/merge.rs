@@ -49,9 +49,8 @@ mod tests
     {
         Declaration
         {
-            line: start_line,
-            name: name.to_owned(),
-            data: DeclType::Function
+            start_line,
+            decl: DeclType::Function { name: name.to_owned() }
         }
     }
 
