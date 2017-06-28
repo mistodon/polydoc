@@ -3,6 +3,15 @@ name = "polydoc"
 version = "0.1.0"
 authors = ["Pirh"]
 
+[lib]
+name = "polydoc"
+path = "src/lib.rs"
+
+[[bin]]
+name = "polydoc"
+path = "src/main.rs"
+doc = false
+
 [dependencies]
 clap = "2.25"
 serde = "1.0"
